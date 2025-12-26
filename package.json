@@ -1,0 +1,36 @@
+{
+  "name": "social-image-agent",
+  "version": "1.0.0",
+  "description": "Social Media Image Agent - watches and processes images for multiple platforms",
+  "type": "module",
+  "main": "dist/cli/index.js",
+  "bin": {
+    "agent": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node dist/cli/index.js",
+    "dev": "tsx src/cli/index.ts"
+  },
+  "keywords": [
+    "image-processing",
+    "social-media",
+    "automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "chokidar": "^4.0.0",
+    "pino": "^9.0.0",
+    "sharp": "^0.33.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
+

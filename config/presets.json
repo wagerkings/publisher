@@ -1,0 +1,84 @@
+{
+  "types": ["feed", "profile", "banner"],
+  "socials": {
+    "instagram": {
+      "feed": {
+        "width": 1080,
+        "height": 1350,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 85
+      },
+      "profile": {
+        "width": 1080,
+        "height": 1080,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 90
+      },
+      "banner": {
+        "width": 1500,
+        "height": 500,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 85
+      }
+    },
+    "facebook": {
+      "feed": {
+        "width": 1200,
+        "height": 1500,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 85
+      },
+      "profile": {
+        "width": 1080,
+        "height": 1080,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 90
+      },
+      "banner": {
+        "width": 1640,
+        "height": 624,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 85
+      }
+    },
+    "onlyfans": {
+      "feed": {
+        "width": 1440,
+        "height": 1800,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 90
+      },
+      "profile": {
+        "width": 1080,
+        "height": 1080,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 92
+      },
+      "banner": {
+        "width": 1600,
+        "height": 600,
+        "fit": "cover",
+        "format": "jpg",
+        "quality": 90
+      }
+    }
+  },
+  "naming": {
+    "outputFilePattern": "{basename}__{hash8}.{ext}"
+  },
+  "processing": {
+    "concurrency": 2,
+    "skipIfExistsAndSameHash": true,
+    "cropStrategy": "entropy",
+    "enableExifOrientation": true
+  }
+}
+
