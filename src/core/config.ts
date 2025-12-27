@@ -21,10 +21,19 @@ export interface NoiseReductionConfig {
 }
 
 export interface EnhancementSettings {
-  liftMidtones?: number;
-  liftShadows?: number;
-  pullHighlights?: number;
-  softenContrast?: number;
+  // Basic adjustments (iPhone Photos-like)
+  brightness?: number; // -1.0 to +1.0 (like iPhone Exposure, 0 = no change)
+  contrast?: number; // 0.0 to 2.0 (1.0 = no change, >1.0 = more contrast)
+  saturation?: number; // 0.0 to 2.0 (1.0 = no change, >1.0 = more saturated)
+  sharpness?: number; // 0.0 to 3.0 (0 = no sharpening, higher = sharper)
+
+  // Advanced adjustments
+  shadows?: number; // -1.0 to +1.0 (lift shadows, 0 = no change)
+  highlights?: number; // -1.0 to +1.0 (pull highlights, 0 = no change)
+  blackPoint?: number; // 0.0 to 1.0 (adjust black level)
+  gamma?: number; // 0.1 to 3.0 (1.0 = no change, >1.0 = brighter midtones)
+
+  // Quality
   noiseReduction?: NoiseReductionConfig;
 }
 
@@ -174,16 +183,28 @@ function isValidEnhancementSettings(
   const s = settings as Record<string, unknown>;
 
   // All fields are optional, but if present must be correct type
-  if (s.liftMidtones !== undefined && typeof s.liftMidtones !== "number") {
+  if (s.brightness !== undefined && typeof s.brightness !== "number") {
     return false;
   }
-  if (s.liftShadows !== undefined && typeof s.liftShadows !== "number") {
+  if (s.contrast !== undefined && typeof s.contrast !== "number") {
     return false;
   }
-  if (s.pullHighlights !== undefined && typeof s.pullHighlights !== "number") {
+  if (s.saturation !== undefined && typeof s.saturation !== "number") {
     return false;
   }
-  if (s.softenContrast !== undefined && typeof s.softenContrast !== "number") {
+  if (s.sharpness !== undefined && typeof s.sharpness !== "number") {
+    return false;
+  }
+  if (s.shadows !== undefined && typeof s.shadows !== "number") {
+    return false;
+  }
+  if (s.highlights !== undefined && typeof s.highlights !== "number") {
+    return false;
+  }
+  if (s.blackPoint !== undefined && typeof s.blackPoint !== "number") {
+    return false;
+  }
+  if (s.gamma !== undefined && typeof s.gamma !== "number") {
     return false;
   }
   if (s.noiseReduction !== undefined) {

@@ -1,69 +1,64 @@
 # Social Media Image Agent
 
-A TypeScript/Node.js CLI tool that watches `models/{model}/raw/` for images and generates platform-specific outputs for Instagram, Facebook, and OnlyFans in feed/profile/banner formats.
+Automatically processes images from `models/{model}/raw/` and generates platform-specific outputs (Instagram, Facebook, OnlyFans) in feed/profile/banner formats.
 
 ## Features
 
-- File watching for new/changed images
-- Config-driven presets for multiple social platforms
-- SQLite manifest for idempotent processing
-- Concurrent processing with error isolation
-- Auto-rotation based on EXIF data
-- Quality and format optimization per platform
+- **Auto-processing** - Watches for new/changed images and processes them automatically
+- **Multi-platform** - Generates outputs for Instagram, Facebook, and OnlyFans
+- **Image enhancements** - Optional automatic enhancements (brightness, shadows, highlights, contrast, noise reduction)
+- **Idempotent** - Only reprocesses images when source files change
+- **Configurable** - Customize dimensions, quality, and enhancement settings per platform
 
-## Installation
+## Quick Start
 
 ```bash
 npm install
 npm run build
-```
 
-## Usage
+# Watch for new images
+npm run dev -- watch
 
-### Watch Mode
+# Process a single file
+npm run dev -- process --model alice --file path/to/image.jpg
 
-Watch for new/changed images in all model directories:
+# Process all files for a model
+npm run dev -- process --model alice --all
 
-```bash
-npm run dev watch
-# or after build:
-npm start watch
-```
+# Force rerender (removes all outputs and reprocesses)
+npm run dev -- process --model alice --all --force
 
-### Process Single File
-
-```bash
-npm run dev process --model alice --file path/to/image.jpg
-```
-
-### Process All Files in Model
-
-```bash
-npm run dev process --model alice --all
-```
-
-### Check Status
-
-```bash
-npm run dev status --model alice
+# Check status
+npm run dev -- status --model alice
 ```
 
 ## Configuration
 
-Edit `config/presets.json` to customize platform presets, dimensions, quality settings, and processing options.
+Edit `config/presets.json` to customize:
 
-## Directory Structure
+- **Platform dimensions** - Width/height per platform and type (feed/profile/banner)
+- **Image quality** - JPEG quality settings
+- **Enhancements** - Optional automatic improvements (brightness, shadows, highlights, contrast, noise reduction)
+- **Processing options** - Crop strategy, concurrency, etc.
 
-- `models/{model}/raw/` - Input images (watched)
-- `models/{model}/{social}/{type}/` - Generated outputs
-  - `{social}`: instagram, facebook, onlyfans
-  - `{type}`: feed, profile, banner
+Enhancements can be enabled/disabled globally and configured per image type (feed/profile/banner).
 
-## Development
+## Output Structure
 
-```bash
-npm run dev watch  # Run in watch mode with tsx
-npm run build      # Compile TypeScript
-npm start watch    # Run compiled version
 ```
-
+models/
+  {model}/
+    raw/              # Input images (watched)
+    instagram/
+      feed/           # Generated outputs
+      profile/
+      banner/
+    facebook/
+      feed/
+      profile/
+      banner/
+    onlyfans/
+      feed/
+      profile/
+      banner/
+```

@@ -1,5 +1,5 @@
-import Database from 'better-sqlite3';
-import { getManifestPath } from './paths.js';
+import Database from "better-sqlite3";
+import { getManifestPath } from "./paths.js";
 
 let db: Database.Database | null = null;
 
@@ -64,7 +64,7 @@ export interface OutputInfo {
 
 export function getFileInfo(sourcePath: string): FileInfo | null {
   const database = getDb();
-  const stmt = database.prepare('SELECT * FROM files WHERE source_path = ?');
+  const stmt = database.prepare("SELECT * FROM files WHERE source_path = ?");
   const row = stmt.get(sourcePath) as FileInfo | undefined;
   return row || null;
 }
@@ -74,7 +74,7 @@ export function updateFile(
   sourceHash: string,
   sourceMtime: number,
   model: string,
-  status: string = 'success'
+  status: string = "success"
 ): number {
   const database = getDb();
   const now = Date.now();
@@ -93,14 +93,21 @@ export function updateFile(
       INSERT INTO files (source_path, source_hash, source_mtime, model, last_processed_at, status)
       VALUES (?, ?, ?, ?, ?, ?)
     `);
-    const result = stmt.run(sourcePath, sourceHash, sourceMtime, model, now, status);
+    const result = stmt.run(
+      sourcePath,
+      sourceHash,
+      sourceMtime,
+      model,
+      now,
+      status
+    );
     return Number(result.lastInsertRowid);
   }
 }
 
 export function getOutputs(fileId: number): OutputInfo[] {
   const database = getDb();
-  const stmt = database.prepare('SELECT * FROM outputs WHERE file_id = ?');
+  const stmt = database.prepare("SELECT * FROM outputs WHERE file_id = ?");
   return stmt.all(fileId) as OutputInfo[];
 }
 
@@ -121,12 +128,32 @@ export function recordOutput(
   stmt.run(fileId, social, type, outputPath, outputHash, now);
 }
 
-export function hasHashChanged(sourcePath: string, sourceHash: string): boolean {
+export function hasHashChanged(
+  sourcePath: string,
+  sourceHash: string
+): boolean {
   const fileInfo = getFileInfo(sourcePath);
   if (!fileInfo) {
     return true;
   }
   return fileInfo.source_hash !== sourceHash;
+}
+
+export function deleteModelOutputs(model: string): void {
+  const database = getDb();
+  const stmt = database.prepare("DELETE FROM files WHERE model = ?");
+  stmt.run(model);
+}
+
+export function getModelOutputFiles(model: string): string[] {
+  const database = getDb();
+  const stmt = database.prepare(`
+    SELECT output_path FROM outputs
+    JOIN files ON outputs.file_id = files.id
+    WHERE files.model = ?
+  `);
+  const rows = stmt.all(model) as Array<{ output_path: string }>;
+  return rows.map((row) => row.output_path);
 }
 
 export function closeDb(): void {
@@ -135,4 +162,3 @@ export function closeDb(): void {
     db = null;
   }
 }
-

@@ -1,16 +1,25 @@
-import { join } from 'path';
-import { mkdirSync } from 'fs';
+import { mkdirSync } from "fs";
+import { join } from "path";
 
 export function getModelRawPath(model: string): string {
-  return join(process.cwd(), 'models', model, 'raw');
+  return join(process.cwd(), "models", model, "raw");
 }
 
-export function getOutputPath(model: string, social: string, type: string, filename: string): string {
-  return join(process.cwd(), 'models', model, social, type, filename);
+export function getOutputPath(
+  model: string,
+  social: string,
+  type: string,
+  filename: string
+): string {
+  return join(process.cwd(), "models", model, social, type, filename);
 }
 
-export function getOutputDir(model: string, social: string, type: string): string {
-  return join(process.cwd(), 'models', model, social, type);
+export function getOutputDir(
+  model: string,
+  social: string,
+  type: string
+): string {
+  return join(process.cwd(), "models", model, social, type);
 }
 
 export function ensureDirectoryExists(dirPath: string): void {
@@ -18,6 +27,9 @@ export function ensureDirectoryExists(dirPath: string): void {
 }
 
 export function getManifestPath(): string {
-  return join(process.cwd(), 'manifest.db');
+  return join(process.cwd(), "manifest.db");
 }
 
+export function getModelOutputBasePath(model: string): string {
+  return join(process.cwd(), "models", model);
+}
