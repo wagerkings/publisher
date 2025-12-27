@@ -78,7 +78,38 @@
     "concurrency": 2,
     "skipIfExistsAndSameHash": true,
     "cropStrategy": "entropy",
-    "enableExifOrientation": true
+    "enableExifOrientation": true,
+    "enhancements": {
+      "enabled": true,
+      "feed": {
+        "liftMidtones": 1.05,
+        "liftShadows": 1.08,
+        "pullHighlights": 0.98,
+        "softenContrast": 0.95,
+        "noiseReduction": {
+          "enabled": true,
+          "sigma": 0.5
+        }
+      },
+      "profile": {
+        "liftMidtones": 1.05,
+        "liftShadows": 1.08,
+        "pullHighlights": 0.98,
+        "softenContrast": 0.95,
+        "noiseReduction": {
+          "enabled": true,
+          "sigma": 0.5
+        }
+      },
+      "banner": {
+        "liftMidtones": 1.03,
+        "liftShadows": 1.05,
+        "pullHighlights": 0.99,
+        "softenContrast": 0.97,
+        "noiseReduction": {
+          "enabled": false
+        }
+      }
+    }
   }
 }
-

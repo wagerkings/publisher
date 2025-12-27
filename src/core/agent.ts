@@ -1,45 +1,70 @@
-import { readFileSync, statSync } from 'fs';
-import { createHash } from 'crypto';
-import { loadConfig, type PresetConfig } from './config.js';
-import * as manifest from './manifest.js';
-import { logger } from './logger.js';
-import { exportImage } from '../processors/exporters.js';
-import { processQueue } from './queue.js';
+import { createHash } from "crypto";
+import { readFileSync, statSync } from "fs";
+import { exportImage } from "../processors/exporters.js";
+import { loadConfig, type PresetConfig } from "./config.js";
+import { logger } from "./logger.js";
+import * as manifest from "./manifest.js";
+import { processQueue } from "./queue.js";
 
 export interface ProcessingTask {
   social: string;
   type: string;
-  preset: import('./config.js').Preset;
+  preset: import("./config.js").Preset;
 }
 
-export async function processFile(filePath: string, model: string, config?: PresetConfig): Promise<void> {
+export async function processFile(
+  filePath: string,
+  model: string,
+  config?: PresetConfig
+): Promise<void> {
   const cfg = config || loadConfig();
-  
+
   try {
     // Compute source file hash
     const fileContent = readFileSync(filePath);
-    const sourceHash = createHash('sha256').update(fileContent).digest('hex');
+    const sourceHash = createHash("sha256").update(fileContent).digest("hex");
     const stats = statSync(filePath);
     const sourceMtime = stats.mtimeMs;
 
     // Check if file needs processing
     if (!manifest.hasHashChanged(filePath, sourceHash)) {
-      logger.info({ file: filePath }, 'File unchanged, skipping');
+      logger.info({ file: filePath }, "File unchanged, skipping");
       return;
     }
 
-    logger.info({ file: filePath, model }, 'Processing file');
+    logger.info({ file: filePath, model }, "Processing file");
 
     // Derive tasks: all social × type combinations
     const tasks = deriveTasks(cfg);
 
     // Get or create file record (for fileId needed for outputs)
-    const fileId = manifest.updateFile(filePath, sourceHash, sourceMtime, model, 'success');
+    const fileId = manifest.updateFile(
+      filePath,
+      sourceHash,
+      sourceMtime,
+      model,
+      "success"
+    );
 
     // Process all tasks
     let hasErrors = false;
     const processTasks = tasks.map((task) => async () => {
       try {
+        // Get enhancement settings for this type if enhancements are enabled
+        let enhancementSettings:
+          | import("./config.js").EnhancementSettings
+          | undefined = undefined;
+        if (cfg.processing.enhancements?.enabled) {
+          const enh = cfg.processing.enhancements;
+          if (task.type === "feed" && enh.feed) {
+            enhancementSettings = enh.feed;
+          } else if (task.type === "profile" && enh.profile) {
+            enhancementSettings = enh.profile;
+          } else if (task.type === "banner" && enh.banner) {
+            enhancementSettings = enh.banner;
+          }
+        }
+
         const result = await exportImage(
           filePath,
           model,
@@ -47,18 +72,33 @@ export async function processFile(filePath: string, model: string, config?: Pres
           task.type,
           task.preset,
           cfg.processing.cropStrategy,
-          cfg.processing.enableExifOrientation
+          cfg.processing.enableExifOrientation,
+          enhancementSettings
         );
 
         // Record output in manifest
-        manifest.recordOutput(fileId, task.social, task.type, result.outputPath, result.outputHash);
+        manifest.recordOutput(
+          fileId,
+          task.social,
+          task.type,
+          result.outputPath,
+          result.outputHash
+        );
 
         logger.info(
-          { file: filePath, social: task.social, type: task.type, output: result.outputPath },
-          'Output created'
+          {
+            file: filePath,
+            social: task.social,
+            type: task.type,
+            output: result.outputPath,
+          },
+          "Output created"
         );
       } catch (error) {
-        logger.error({ error, file: filePath, social: task.social, type: task.type }, 'Failed to process task');
+        logger.error(
+          { error, file: filePath, social: task.social, type: task.type },
+          "Failed to process task"
+        );
         hasErrors = true;
         throw error;
       }
@@ -68,12 +108,12 @@ export async function processFile(filePath: string, model: string, config?: Pres
 
     // Update file record with final status
     if (hasErrors) {
-      manifest.updateFile(filePath, sourceHash, sourceMtime, model, 'error');
+      manifest.updateFile(filePath, sourceHash, sourceMtime, model, "error");
     }
 
-    logger.info({ file: filePath, model }, 'File processing completed');
+    logger.info({ file: filePath, model }, "File processing completed");
   } catch (error) {
-    logger.error({ error, file: filePath, model }, 'Failed to process file');
+    logger.error({ error, file: filePath, model }, "Failed to process file");
     throw error;
   }
 }
@@ -92,4 +132,3 @@ function deriveTasks(config: PresetConfig): ProcessingTask[] {
 
   return tasks;
 }
-
